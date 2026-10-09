@@ -3,6 +3,7 @@
 import { useState } from "react";
 import BlurFade from "@/components/magicui/blur-fade";
 import { DATA } from "@/data/resume";
+import { asset } from "@/lib/asset";
 import { Award, ArrowUpRight } from "lucide-react";
 import Link from "next/link";
 
@@ -22,7 +23,7 @@ function CertLogo({ src, alt }: { src?: string; alt: string }) {
   return (
     <div className="h-11 w-11 rounded-xl border border-border bg-background flex items-center justify-center flex-shrink-0 p-1.5">
       <img
-        src={src}
+        src={asset(src)}
         alt={`${alt} logo`}
         className="max-h-full max-w-full object-contain"
         onError={() => setError(true)}

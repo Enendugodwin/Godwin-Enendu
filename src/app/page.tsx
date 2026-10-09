@@ -3,6 +3,7 @@ import BlurFade from "@/components/magicui/blur-fade";
 import BlurFadeText from "@/components/magicui/blur-fade-text";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { DATA } from "@/data/resume";
+import { asset } from "@/lib/asset";
 import Link from "next/link";
 import Markdown from "react-markdown";
 import ContactSection from "@/components/section/contact-section";
@@ -38,7 +39,7 @@ export default function Page() {
                 <div className="relative">
                   <div className="absolute -inset-4 rounded-full bg-primary/20 blur-3xl" aria-hidden="true" />
                   <Avatar className="relative size-28 sm:size-36 border border-border rounded-full shadow-2xl ring-4 ring-muted">
-                    <AvatarImage alt={DATA.name} src={DATA.avatarUrl} className="object-cover object-[center_40%]" />
+                    <AvatarImage alt={DATA.name} src={asset(DATA.avatarUrl)} className="object-cover object-[center_40%]" />
                     <AvatarFallback className="text-3xl sm:text-4xl font-bold bg-muted">
                       {DATA.initials}
                     </AvatarFallback>
@@ -81,7 +82,7 @@ export default function Page() {
                   <ArrowUpRight className="size-4" />
                 </a>
                 <a
-                  href="/cv.pdf"
+                  href={asset("/cv.pdf")}
                   download
                   className="inline-flex items-center gap-2 px-6 py-3 rounded-lg border border-border bg-background text-foreground text-sm font-semibold hover:bg-muted transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                 >
