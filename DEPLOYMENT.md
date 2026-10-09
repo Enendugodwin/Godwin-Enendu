@@ -1,292 +1,120 @@
-# Deployment Guide: Godwin Enendu Cybersecurity Portfolio
+# Deployment Guide — Cloudflare
 
-## Overview
+This portfolio is a **Next.js app deployed to Cloudflare Workers** using the
+[OpenNext Cloudflare adapter](https://opennext.js.org/cloudflare). This runs the
+full app — including the `/api/projects` route that serves live, pinned GitHub
+repositories (15-minute cache) — so the Projects section updates automatically
+without a redeploy.
 
-This portfolio uses:
-- **Frontend**: Next.js 16 on Cloudflare Pages
-- **API**: Cloudflare Worker for GitHub GraphQL integration
-- **Cache**: Cloudflare KV for 15-minute response caching
+## Architecture
+
+| Piece | Where |
+|-------|-------|
+| Next.js app (SSR + `/api/projects`) | Cloudflare Worker (`godwin-portfolio`) |
+| GitHub token | Worker secret `GITHUB_TOKEN` (never in the client) |
+| Static assets | Served from the Worker's `ASSETS` binding |
+| CI/CD | GitHub Actions (`.github/workflows/deploy-cloudflare.yml`) |
+
+## Files
+
+- `open-next.config.ts` — OpenNext Cloudflare config
+- `wrangler.jsonc` — Worker name, entry, `nodejs_compat`, assets binding
+- `.github/workflows/deploy-cloudflare.yml` — build + deploy on push to `main`
+- `src/app/api/projects/route.ts` — API used by the Projects section
 
 ---
 
-## 1. Local Development
-
-### Prerequisites
-- Node.js 18+
-- pnpm 12+
-- GitHub Personal Access Token (classic or fine-grained with `public_repo` scope)
-
-### Setup
+## 1. Local development
 
 ```bash
-# Clone and install
-git clone https://github.com/magicuidesign/portfolio.git godwin-portfolio
-cd godwin-portfolio
-
-# Enable pnpm and install
-corepack enable
 pnpm install
-
-# Create local env file
-cp .env.example .env.local
-# Edit .env.local and add your GITHUB_TOKEN
-
-# Run dev server
-pnpm dev
+cp .env.example .env.local     # set GITHUB_TOKEN
+pnpm dev                       # http://localhost:3000
 ```
 
-Open http://localhost:3001
+## 2. One-time Cloudflare setup
 
----
+### a) Create an API token
+Cloudflare dashboard → **My Profile → API Tokens → Create Token** →
+use the **"Edit Cloudflare Workers"** template.
+Copy the token.
 
-## 2. Cloudflare Worker Deployment
+### b) Get your Account ID
+Cloudflare dashboard → **Workers & Pages** → right sidebar shows **Account ID**.
 
-### Create KV Namespace
+### c) Add repo secrets (GitHub → Settings → Secrets and variables → Actions)
+| Secret | Value |
+|--------|-------|
+| `CLOUDFLARE_API_TOKEN` | the token from (a) |
+| `CLOUDFLARE_ACCOUNT_ID` | your account ID from (b) |
+
+### d) Set the GitHub token as a Worker secret
+After the first deploy creates the Worker, run once locally:
 
 ```bash
-# Production KV
-wrangler kv:namespace create CACHE_KV
-
-# Preview/Development KV
-wrangler kv:namespace create CACHE_KV --preview
-```
-
-Copy the returned IDs and update `wrangler.toml`:
-
-```toml
-[[kv_namespaces]]
-binding = "CACHE_KV"
-id = "your-production-kv-id"
-preview_id = "your-preview-kv-id"
-```
-
-### Configure Worker Secrets
-
-```bash
-# Set GitHub token as secret (never in wrangler.toml!)
+wrangler login
 wrangler secret put GITHUB_TOKEN
-# Enter your GitHub PAT when prompted
-
-# Set allowed origin
-wrangler secret put ALLOWED_ORIGIN
-# Enter: https://your-project.pages.dev
+# paste a read-only GitHub PAT when prompted
 ```
 
-### Deploy Worker
+Optional: create a KV namespace for edge caching and uncomment the
+`kv_namespaces` block in `wrangler.jsonc`:
 
 ```bash
-wrangler deploy
+wrangler kv namespace create CACHE_KV
 ```
 
-Worker will be available at: `https://godwin-portfolio-api.your-subdomain.workers.dev`
+## 3. Deploy
 
----
+**Automatic:** push to `main` — the GitHub Action builds and deploys.
 
-## 3. Cloudflare Pages Deployment
-
-### Connect Repository
-
-1. Go to Cloudflare Dashboard → Pages
-2. Click "Create a project" → "Connect to Git"
-3. Select your GitHub repository
-4. Configure build settings:
-   - **Build command**: `pnpm build`
-   - **Build output directory**: `.next`
-   - **Root directory**: `/` (or `/godwin-portfolio` if in subfolder)
-
-### Environment Variables (Pages)
-
-In Pages project settings → Environment variables:
-
-| Variable | Value |
-|----------|-------|
-| `GITHUB_TOKEN` | Your GitHub PAT (use "Encrypt" toggle) |
-| `ALLOWED_ORIGIN` | `https://your-project.pages.dev` |
-
-### Custom Domain
-
-1. In Pages project → Custom domains
-2. Add your domain (e.g., `godwin-enendu.pages.dev` or custom domain)
-3. Update `ALLOWED_ORIGIN` in Worker and Pages to match
-
----
-
-## 4. GitHub Token Setup
-
-### Option A: Classic PAT
-1. Go to https://github.com/settings/tokens
-2. Generate new token (classic)
-3. Scope: `public_repo`
-4. Copy token immediately
-
-### Option B: Fine-grained PAT (Recommended)
-1. Go to https://github.com/settings/tokens?type=beta
-2. Generate new token
-3. Repository access: Select `enendugodwin` repositories
-4. Permissions: `Contents` → `Read-only`
-5. Copy token immediately
-
----
-
-## 5. Architecture Details
-
-### API Response Format
-
-```json
-{
-  "source": "github" | "cache" | "fallback",
-  "syncedAt": "2026-10-09T12:00:00.000Z",
-  "projects": [
-    {
-      "name": "repo-name",
-      "description": "Repository description",
-      "url": "https://github.com/enendugodwin/repo-name",
-      "homepageUrl": "https://demo-url.com",
-      "updatedAt": "2026-10-04T12:00:00Z",
-      "stargazerCount": 42,
-      "forkCount": 5,
-      "primaryLanguage": { "name": "Python", "color": "#3572A5" },
-      "repositoryTopics": { "nodes": [{ "topic": { "name": "security" } }] },
-      "isArchived": false
-    }
-  ]
-}
-```
-
-### Caching Strategy
-
-- **TTL**: 15 minutes (900 seconds)
-- **Storage**: Cloudflare KV (edge-distributed)
-- **Fallback**: Static fallback projects if both GitHub and cache fail
-- **Headers**: `Cache-Control: public, max-age=600, stale-while-revalidate=300`
-
-### CORS Configuration
-
-- Worker validates `Origin` header against `ALLOWED_ORIGIN`
-- Rejects requests from unauthorized origins
-- Allows `GET` and `OPTIONS` methods only
-
----
-
-## 6. Verification Checklist
-
-### Local
-- [ ] Dev server runs at `http://localhost:3001`
-- [ ] Projects load from API (check Network tab)
-- [ ] Fallback shows when token missing
-- [ ] All sections render correctly
-
-### Worker
-- [ ] `GET /api/projects` returns JSON
-- [ ] `OPTIONS /api/projects` returns CORS headers
-- [ ] Unauthorized origin rejected (403)
-- [ ] Token not visible in response
-- [ ] Cache works (second request faster)
-
-### Pages
-- [ ] Build succeeds
-- [ ] All routes accessible
-- [ ] Projects section loads data
-- [ ] Custom domain works
-- [ ] HTTPS enforced
-
-### Security
-- [ ] No tokens in client bundle
-- [ ] No tokens in Git history
-- [ ] CSP headers present
-- [ ] Security headers present
-
----
-
-## 7. Updating Pinned Repositories
-
-1. Go to https://github.com/enendugodwin
-2. Click "Customize your pins" on profile
-3. Select/reorder up to 6 repositories
-4. Changes appear on website within **15 minutes** (cache TTL)
-
-No redeployment needed!
-
----
-
-## 8. Troubleshooting
-
-### Projects not loading
-- Check Worker logs: `wrangler tail`
-- Verify GITHUB_TOKEN is set in Worker secrets
-- Check GitHub API rate limits
-
-### CORS errors
-- Ensure `ALLOWED_ORIGIN` matches exactly (including protocol)
-- Check Worker CORS headers in browser Network tab
-
-### Build failures
-- Run `pnpm build` locally first
-- Check for TypeScript errors
-- Verify all imports resolve
-
-### Cache not working
-- Verify KV namespace ID in `wrangler.toml`
-- Check `CACHE_KV` binding in Worker
-- Monitor KV operations in Cloudflare dashboard
-
----
-
-## 9. File Structure Summary
-
-```
-godwin-portfolio/
-├── src/
-│   ├── app/
-│   │   ├── api/projects/route.ts    # Next.js API route (dev)
-│   │   ├── page.tsx                 # Main page
-│   │   └── layout.tsx
-│   ├── components/
-│   │   ├── section/
-│   │   │   ├── projects-section.tsx # Dynamic GitHub projects
-│   │   │   ├── expertise-section.tsx
-│   │   │   ├── certifications-section.tsx
-│   │   │   ├── work-section.tsx
-│   │   │   └── contact-section.tsx
-│   │   └── ...
-│   ├── data/resume.tsx              # CV data (source of truth)
-│   └── ...
-├── worker/
-│   └── index.ts                     # Cloudflare Worker
-├── wrangler.toml                    # Worker config
-├── .env.example                     # Env template
-└── DEPLOYMENT.md                    # This file
-```
-
----
-
-## 10. Commands Reference
+**Manual:**
 
 ```bash
-# Development
-pnpm dev                 # Start dev server
-pnpm build               # Production build
-pnpm lint                # Run ESLint
-pnpm lint:fix            # Fix lint issues
-
-# Worker
-wrangler dev             # Local worker dev
-wrangler deploy          # Deploy worker
-wrangler tail            # View worker logs
-wrangler secret put KEY  # Set secret
-
-# KV
-wrangler kv:namespace create CACHE_KV
-wrangler kv:key list --binding CACHE_KV
-wrangler kv:key get pinned_projects --binding CACHE_KV
+pnpm exec opennextjs-cloudflare build
+pnpm exec wrangler deploy
 ```
+
+The app is served at `https://godwin-portfolio.<your-subdomain>.workers.dev`.
+
+> ⚠️ **Windows:** OpenNext's bundling step does not run on Windows. Build on
+> Linux/macOS, in WSL, or via GitHub Actions (recommended). Next.js `next dev`
+> and `next build` still work fine on Windows.
+
+## 4. Connecting a custom domain (optional)
+
+Cloudflare dashboard → Workers & Pages → `godwin-portfolio` → **Settings →
+Domains & Routes → Add custom domain**. Then set `ALLOWED_ORIGIN` in
+`wrangler.jsonc` to that origin to lock down CORS.
 
 ---
 
-## Support
+## Alternative: Cloudflare dashboard Git integration
 
-For issues:
-1. Check Worker logs: `wrangler tail`
-2. Check Pages build logs in Cloudflare dashboard
-3. Verify GitHub token permissions
-4. Test API directly: `curl https://your-worker.workers.dev/api/projects`
+Instead of GitHub Actions, you can connect the repo directly:
+
+1. Cloudflare dashboard → **Workers & Pages → Create → Connect to Git**
+2. Select the repository
+3. Build command: `npx opennextjs-cloudflare build`
+   Deploy command: `npx wrangler deploy`
+4. Add `GITHUB_TOKEN` under the Worker's **Settings → Variables and Secrets**
+
+Either method works; the GitHub Action is version-controlled and reproducible.
+
+---
+
+## Verification checklist
+
+- [ ] `pnpm build` succeeds locally
+- [ ] `pnpm exec opennextjs-cloudflare build` succeeds on Linux/CI
+- [ ] Worker deployed; site loads at the `.workers.dev` URL
+- [ ] `/api/projects` returns JSON with your pinned repos
+- [ ] Projects section shows repos; images/CV load
+- [ ] `GITHUB_TOKEN` set as a Worker **secret** (not a plain var, not in git)
+- [ ] Changing pins updates the site within 15 minutes
+
+## Security notes
+
+- The GitHub token lives only as a Worker secret and in `.env.local` (gitignored).
+- Never commit `.env.local`, `.dev.vars`, or paste tokens into source.
+- Use a **read-only** GitHub token (public repo metadata only).

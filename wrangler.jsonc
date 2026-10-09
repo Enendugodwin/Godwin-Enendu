@@ -1,0 +1,17 @@
+{
+  // Cloudflare Worker that runs the Next.js app (SSR + API routes) via OpenNext.
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "godwin-portfolio",
+  "main": ".open-next/worker.js",
+  "compatibility_date": "2025-03-01",
+  "compatibility_flags": ["nodejs_compat"],
+  "assets": {
+    "directory": ".open-next/assets",
+    "binding": "ASSETS"
+  },
+  // Uncomment to cache GitHub API responses at the edge (recommended):
+  // "kv_namespaces": [{ "binding": "CACHE_KV", "id": "<KV_NAMESPACE_ID>" }],
+  "vars": {
+    "ALLOWED_ORIGIN": "*"
+  }
+}
