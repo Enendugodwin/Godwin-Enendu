@@ -67,30 +67,8 @@ caching and a fallback dataset.
 
 ## Deployment
 
-### GitHub Pages (static)
-
-The site is a static export (`output: "export"` → `out/`) and deploys via
-GitHub Actions (`.github/workflows/deploy.yml`) on every push to `main`, plus a
-daily scheduled rebuild to refresh GitHub project data.
-
-**One-time setup:**
-1. Repo → **Settings → Pages → Build and deployment → Source: GitHub Actions**
-2. (Optional) Add a `GH_PAT` repo secret for higher GitHub API rate limits;
-   otherwise the automatic `GITHUB_TOKEN` is used.
-
-**Base path:** served as a project site at `https://enendugodwin.github.io/Godwin-Enendu/`,
-so the workflow sets `NEXT_PUBLIC_BASE_PATH=/Godwin-Enendu`. If you rename the
-repo to `enendugodwin.github.io` (user site at the domain root), set it to empty.
-
-**Refreshing projects:** the build fetches pinned repos via `scripts/fetch-projects.mjs`
-using `GITHUB_TOKEN`. Pin/unpin/reorder on GitHub, then re-run the workflow
-(often automatic daily, or trigger it manually) — no code change needed.
-
-### Cloudflare (optional)
-
-The repo also includes a Cloudflare Worker (`worker/index.ts`) that serves
-`/api/projects` with live 15-minute caching for truly real-time updates. See
-[DEPLOYMENT.md](./DEPLOYMENT.md) for Cloudflare Pages + Worker setup.
+See [DEPLOYMENT.md](./DEPLOYMENT.md) for Cloudflare Pages + Worker setup, secrets,
+and verification steps.
 
 ## Project Structure
 

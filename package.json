@@ -7,8 +7,7 @@
   },
   "scripts": {
     "dev": "next dev",
-    "fetch:projects": "node scripts/fetch-projects.mjs",
-    "build": "node scripts/fetch-projects.mjs && next build",
+    "build": "next build",
     "start": "next start",
     "lint": "eslint",
     "lint:fix": "eslint --fix"

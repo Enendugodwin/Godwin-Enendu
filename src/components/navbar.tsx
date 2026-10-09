@@ -8,7 +8,6 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { DATA } from "@/data/resume";
-import { asset } from "@/lib/asset";
 import { Download, FileText } from "lucide-react";
 
 export default function Navbar() {
@@ -46,7 +45,7 @@ export default function Navbar() {
         <Tooltip>
           <TooltipTrigger asChild>
             <a
-              href={asset("/cv.pdf")}
+              href="/cv.pdf"
               download
               className="flex items-center gap-1"
             >
