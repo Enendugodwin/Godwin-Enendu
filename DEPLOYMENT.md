@@ -15,6 +15,8 @@ without a redeploy.
 | Static assets | Served from the Worker's `ASSETS` binding |
 | CI/CD | GitHub Actions (`.github/workflows/deploy-cloudflare.yml`) |
 
+> **Requires Node.js 22+** (Wrangler requirement). CI uses Node 22.
+
 ## Files
 
 - `open-next.config.ts` — OpenNext Cloudflare config
