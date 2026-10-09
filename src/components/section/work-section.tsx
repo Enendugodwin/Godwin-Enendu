@@ -8,6 +8,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { DATA } from "@/data/resume";
+import { asset } from "@/lib/asset";
 import { ChevronDown, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -36,7 +37,7 @@ function LogoImage({ src, alt }: { src: string; alt: string }) {
 
   return (
     <img
-      src={src}
+      src={asset(src)}
       alt={alt}
       className="size-10 p-1 border rounded-full shadow ring-2 ring-border overflow-hidden object-contain flex-none bg-background"
       onError={() => setImageError(true)}

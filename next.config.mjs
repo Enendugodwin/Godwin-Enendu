@@ -1,34 +1,19 @@
-import { withContentCollections } from "@content-collections/next";
+// Base path when hosting on GitHub Pages as a project site:
+//   https://<user>.github.io/<repo>/  ->  basePath = "/<repo>"
+// For a user/org site (repo named <user>.github.io) or local dev, leave empty.
+const basePath = process.env.NEXT_PUBLIC_BASE_PATH || "";
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  async headers() {
-    return [
-      {
-        source: "/:path*",
-        headers: [
-          {
-            key: "X-Content-Type-Options",
-            value: "nosniff",
-          },
-          {
-            key: "X-Frame-Options",
-            value: "DENY",
-          },
-          {
-            key: "Referrer-Policy",
-            value: "strict-origin-when-cross-origin",
-          },
-          {
-            key: "Permissions-Policy",
-            value: "camera=(), microphone=(), geolocation=()",
-          },
-        ],
-      },
-    ];
+  // GitHub Pages serves static files only.
+  output: "export",
+  basePath,
+  assetPrefix: basePath || undefined,
+  trailingSlash: true,
+  images: {
+    unoptimized: true,
   },
 };
 
-// withContentCollections must be the outermost plugin
-export default withContentCollections(nextConfig);
+export default nextConfig;

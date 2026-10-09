@@ -1,5 +1,6 @@
 import { FlickeringGrid } from "@/components/magicui/flickering-grid";
 import { DATA } from "@/data/resume";
+import { asset } from "@/lib/asset";
 import { Mail, Github, Linkedin, MapPin, Download } from "lucide-react";
 
 export default function ContactSection() {
@@ -56,7 +57,7 @@ export default function ContactSection() {
               GitHub
             </a>
             <a
-              href="/cv.pdf"
+              href={asset("/cv.pdf")}
               download
               className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors w-full sm:w-auto"
             >
