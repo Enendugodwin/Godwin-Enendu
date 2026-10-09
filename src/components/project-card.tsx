@@ -105,19 +105,21 @@ export function ProjectCard({
             <ArrowUpRight className="h-4 w-4" aria-hidden />
           </Link>
         </div>
-        <div className="text-sm flex-1 text-muted-foreground leading-relaxed">
+        <div className="text-sm flex-1 text-muted-foreground leading-relaxed line-clamp-4">
           <Markdown>{description}</Markdown>
         </div>
-        {(stars !== undefined || forks !== undefined) && (
+        {((stars ?? 0) > 0 || (forks ?? 0) > 0) && (
           <div className="flex items-center gap-4 text-xs text-muted-foreground">
-            {stars !== undefined && (
-              <span className="flex items-center gap-1">
-                <Star className="size-3.5" aria-hidden /> {stars.toLocaleString()}
+            {(stars ?? 0) > 0 && (
+              <span className="flex items-center gap-1" title={`${stars} stars`}>
+                <Star className="size-3.5" aria-hidden />
+                {stars!.toLocaleString()} <span className="hidden sm:inline">stars</span>
               </span>
             )}
-            {forks !== undefined && (
-              <span className="flex items-center gap-1">
-                <GitFork className="size-3.5" aria-hidden /> {forks.toLocaleString()}
+            {(forks ?? 0) > 0 && (
+              <span className="flex items-center gap-1" title={`${forks} forks`}>
+                <GitFork className="size-3.5" aria-hidden />
+                {forks!.toLocaleString()} <span className="hidden sm:inline">forks</span>
               </span>
             )}
           </div>

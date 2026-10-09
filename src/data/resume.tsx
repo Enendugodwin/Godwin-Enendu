@@ -14,11 +14,12 @@ import { Csharp } from "@/components/ui/svgs/csharp";
 export const DATA = {
   name: "Godwin Enendu",
   initials: "GE",
-  url: "https://godwin-enendu.pages.dev",
+  url: "https://godwinenendu.enendugodwin.workers.dev",
   location: "Lagos, Nigeria",
   locationLink: "https://www.google.com/maps/place/Lagos,+Nigeria",
+  tagline: "Cybersecurity Engineer | Detection Engineering | Security Automation",
   description:
-    "Cybersecurity Analyst | Security Operations | Detection & Automation",
+    "Building practical security solutions for threat detection, network visibility, threat intelligence, and automated defense.",
   summary:
     "Security operations professional with 3+ years of experience monitoring and investigating security events, improving detection, administering enterprise security controls, and automating repetitive SOC tasks. Background in Computer Science with hands-on expertise in SIEM monitoring, incident investigation, detection engineering, threat intelligence integration, and security automation using Python and PowerShell.",
   avatarUrl: "/me.jpeg",

@@ -11,7 +11,7 @@ import ExpertiseSection from "@/components/section/expertise-section";
 import ProjectsSection from "@/components/section/projects-section";
 import WorkSection from "@/components/section/work-section";
 import CertificationsSection from "@/components/section/certifications-section";
-import { ArrowUpRight, Shield, Network, Brain, Terminal, Database, Zap, Code, Download } from "lucide-react";
+import { ArrowUpRight, Shield, Network, Brain, Terminal, Database, Zap, Code, Download, Github, Linkedin } from "lucide-react";
 
 const BLUR_FADE_DELAY = 0.04;
 
@@ -53,13 +53,15 @@ export default function Page() {
                 text={`Hi, I'm ${DATA.name.split(" ")[0]}`}
               />
               <BlurFadeText
-                className="text-lg sm:text-xl lg:text-2xl text-muted-foreground max-w-2xl"
+                delay={BLUR_FADE_DELAY}
+                className="text-lg sm:text-xl lg:text-2xl font-semibold text-primary max-w-2xl"
+                text={DATA.tagline}
+              />
+              <BlurFadeText
+                className="text-base sm:text-lg text-muted-foreground max-w-2xl"
                 delay={BLUR_FADE_DELAY}
                 text={DATA.description}
               />
-              <p className="text-base text-muted-foreground max-w-2xl leading-relaxed">
-                {DATA.summary.split(".").slice(0, 2).join(".") + "."}
-              </p>
               <div className="flex flex-wrap gap-2 justify-center">
                 {DATA.skills.slice(0, 6).map((skill) => {
                   const Icon = skillIcons[skill.name as keyof typeof skillIcons] || Shield;
@@ -73,12 +75,12 @@ export default function Page() {
                   );
                 })}
               </div>
-              <div className="flex flex-wrap gap-3 justify-center mt-2">
+              <div className="flex flex-wrap items-center justify-center gap-3 mt-2">
                 <a
-                  href="#contact"
+                  href="#projects"
                   className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-primary text-primary-foreground text-sm font-semibold hover:bg-primary/90 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                 >
-                  Get In Touch
+                  Explore Projects
                   <ArrowUpRight className="size-4" />
                 </a>
                 <a
@@ -88,6 +90,24 @@ export default function Page() {
                 >
                   <Download className="size-4" />
                   Download CV
+                </a>
+                <a
+                  href={DATA.contact.social.GitHub.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="GitHub profile"
+                  className="inline-flex items-center justify-center size-11 rounded-lg border border-border bg-background text-muted-foreground hover:text-foreground hover:bg-muted transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                >
+                  <Github className="size-5" aria-hidden="true" />
+                </a>
+                <a
+                  href={DATA.contact.social.LinkedIn.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="LinkedIn profile"
+                  className="inline-flex items-center justify-center size-11 rounded-lg border border-border bg-background text-muted-foreground hover:text-foreground hover:bg-muted transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                >
+                  <Linkedin className="size-5" aria-hidden="true" />
                 </a>
               </div>
           </div>

@@ -23,13 +23,15 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL(DATA.url),
   title: {
-    default: DATA.name,
+    default: `${DATA.name} | Cybersecurity Engineer`,
     template: `%s | ${DATA.name}`,
   },
-  description: DATA.description,
+  description:
+    "Cybersecurity engineer focused on detection engineering and security automation — building practical tools for threat detection, network visibility, and automated defense.",
   openGraph: {
-    title: `${DATA.name}`,
-    description: DATA.description,
+    title: `${DATA.name} | Cybersecurity Engineer`,
+    description:
+      "Cybersecurity engineer focused on detection engineering and security automation.",
     url: DATA.url,
     siteName: `${DATA.name}`,
     locale: "en_US",
