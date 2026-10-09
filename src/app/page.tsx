@@ -6,142 +6,154 @@ import { DATA } from "@/data/resume";
 import Link from "next/link";
 import Markdown from "react-markdown";
 import ContactSection from "@/components/section/contact-section";
-import HackathonsSection from "@/components/section/hackathons-section";
+import ExpertiseSection from "@/components/section/expertise-section";
 import ProjectsSection from "@/components/section/projects-section";
 import WorkSection from "@/components/section/work-section";
-import { ArrowUpRight } from "lucide-react";
+import CertificationsSection from "@/components/section/certifications-section";
+import { ArrowUpRight, Shield, Network, Brain, Terminal, Database, Zap, Code, Download } from "lucide-react";
 
 const BLUR_FADE_DELAY = 0.04;
 
+const skillIcons = {
+  "SIEM & QRadar": Brain,
+  "Python": Terminal,
+  "PowerShell": Terminal,
+  "Network Security": Network,
+  "Endpoint Security": Shield,
+  "Threat Intelligence": Brain,
+  "DLP & DAM": Database,
+  "Automation": Zap,
+  "Linux/Windows": Code,
+  "Active Directory": Network,
+} as const;
+
 export default function Page() {
   return (
-    <main className="min-h-dvh flex flex-col gap-14 relative">
-      <section id="hero">
-        <div className="mx-auto w-full max-w-2xl space-y-8">
-          <div className="gap-2 gap-y-6 flex flex-col md:flex-row justify-between">
-            <div className="gap-2 flex flex-col order-2 md:order-1">
+    <main className="min-h-dvh flex flex-col gap-16 sm:gap-24 lg:gap-32">
+      {/* HERO */}
+      <section id="hero" className="pt-8 sm:pt-16 lg:pt-20">
+        <div className="mx-auto w-full max-w-3xl">
+          <div className="flex flex-col items-center gap-6 text-center">
+              <BlurFade delay={BLUR_FADE_DELAY}>
+                <div className="relative">
+                  <div className="absolute -inset-4 rounded-full bg-primary/20 blur-3xl" aria-hidden="true" />
+                  <Avatar className="relative size-28 sm:size-36 border border-border rounded-full shadow-2xl ring-4 ring-muted">
+                    <AvatarImage alt={DATA.name} src={DATA.avatarUrl} className="object-cover object-[center_40%]" />
+                    <AvatarFallback className="text-3xl sm:text-4xl font-bold bg-muted">
+                      {DATA.initials}
+                    </AvatarFallback>
+                  </Avatar>
+                </div>
+              </BlurFade>
               <BlurFadeText
                 delay={BLUR_FADE_DELAY}
-                className="text-3xl font-semibold tracking-tighter sm:text-4xl lg:text-5xl"
+                className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold tracking-tight leading-tight"
                 yOffset={8}
                 text={`Hi, I'm ${DATA.name.split(" ")[0]}`}
               />
               <BlurFadeText
-                className="text-muted-foreground max-w-[600px] md:text-lg lg:text-xl"
+                className="text-lg sm:text-xl lg:text-2xl text-muted-foreground max-w-2xl"
                 delay={BLUR_FADE_DELAY}
                 text={DATA.description}
               />
-            </div>
-            <BlurFade delay={BLUR_FADE_DELAY} className="order-1 md:order-2">
-              <Avatar className="size-24 md:size-32 border rounded-full shadow-lg ring-4 ring-muted">
-                <AvatarImage alt={DATA.name} src={DATA.avatarUrl} />
-                <AvatarFallback>{DATA.initials}</AvatarFallback>
-              </Avatar>
+              <p className="text-base text-muted-foreground max-w-2xl leading-relaxed">
+                {DATA.summary.split(".").slice(0, 2).join(".") + "."}
+              </p>
+              <div className="flex flex-wrap gap-2 justify-center">
+                {DATA.skills.slice(0, 6).map((skill) => {
+                  const Icon = skillIcons[skill.name as keyof typeof skillIcons] || Shield;
+                  return (
+                    <BlurFade key={skill.name} delay={BLUR_FADE_DELAY}>
+                      <span className="flex items-center gap-1.5 border bg-background border-border ring-2 ring-border/20 rounded-xl h-9 w-fit px-3.5 text-sm">
+                        <Icon className="size-4 text-primary" aria-hidden="true" />
+                        <span className="text-foreground font-medium">{skill.name}</span>
+                      </span>
+                    </BlurFade>
+                  );
+                })}
+              </div>
+              <div className="flex flex-wrap gap-3 justify-center mt-2">
+                <a
+                  href="#contact"
+                  className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-primary text-primary-foreground text-sm font-semibold hover:bg-primary/90 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                >
+                  Get In Touch
+                  <ArrowUpRight className="size-4" />
+                </a>
+                <a
+                  href="/cv.pdf"
+                  download
+                  className="inline-flex items-center gap-2 px-6 py-3 rounded-lg border border-border bg-background text-foreground text-sm font-semibold hover:bg-muted transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                >
+                  <Download className="size-4" />
+                  Download CV
+                </a>
+              </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ABOUT */}
+      <section id="about" className="mx-auto w-full max-w-7xl">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
+          <div className="lg:col-span-4">
+            <BlurFade delay={BLUR_FADE_DELAY * 3}>
+              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold">About</h2>
+            </BlurFade>
+          </div>
+          <div className="lg:col-span-8">
+            <BlurFade delay={BLUR_FADE_DELAY * 4}>
+              <div className="prose prose-lg max-w-none text-pretty font-sans leading-relaxed text-muted-foreground dark:prose-invert">
+                <Markdown>{DATA.summary}</Markdown>
+              </div>
             </BlurFade>
           </div>
         </div>
       </section>
-      <section id="about">
-        <div className="flex min-h-0 flex-col gap-y-4">
-          <BlurFade delay={BLUR_FADE_DELAY * 3}>
-            <h2 className="text-xl font-bold">About</h2>
-          </BlurFade>
-          <BlurFade delay={BLUR_FADE_DELAY * 4}>
-            <div className="prose max-w-full text-pretty font-sans leading-relaxed text-muted-foreground dark:prose-invert">
-              <Markdown>
-                {DATA.summary}
-              </Markdown>
-            </div>
-          </BlurFade>
-        </div>
+
+      {/* EXPERTISE */}
+      <section id="expertise" className="mx-auto w-full max-w-7xl">
+        <BlurFade delay={BLUR_FADE_DELAY * 5}>
+          <ExpertiseSection />
+        </BlurFade>
       </section>
-      <section id="work">
-        <div className="flex min-h-0 flex-col gap-y-6">
-          <BlurFade delay={BLUR_FADE_DELAY * 5}>
-            <h2 className="text-xl font-bold">Work Experience</h2>
-          </BlurFade>
-          <BlurFade delay={BLUR_FADE_DELAY * 6}>
-            <WorkSection />
-          </BlurFade>
-        </div>
-      </section>
-      <section id="education">
-        <div className="flex min-h-0 flex-col gap-y-6">
-          <BlurFade delay={BLUR_FADE_DELAY * 7}>
-            <h2 className="text-xl font-bold">Education</h2>
-          </BlurFade>
-          <div className="flex flex-col gap-8">
-            {DATA.education.map((education, index) => (
-              <BlurFade
-                key={education.school}
-                delay={BLUR_FADE_DELAY * 8 + index * 0.05}
-              >
-                <Link
-                  href={education.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-x-3 justify-between group"
-                >
-                  <div className="flex items-center gap-x-3 flex-1 min-w-0">
-                    {education.logoUrl ? (
-                      <img
-                        src={education.logoUrl}
-                        alt={education.school}
-                        className="size-8 md:size-10 p-1 border rounded-full shadow ring-2 ring-border overflow-hidden object-contain flex-none"
-                      />
-                    ) : (
-                      <div className="size-8 md:size-10 p-1 border rounded-full shadow ring-2 ring-border bg-muted flex-none" />
-                    )}
-                    <div className="flex-1 min-w-0 flex flex-col gap-0.5">
-                      <div className="font-semibold leading-none flex items-center gap-2">
-                        {education.school}
-                        <ArrowUpRight className="h-3.5 w-3.5 text-muted-foreground opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-200" aria-hidden />
-                      </div>
-                      <div className="font-sans text-sm text-muted-foreground">
-                        {education.degree}
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-1 text-xs tabular-nums text-muted-foreground text-right flex-none">
-                    <span>
-                      {education.start} - {education.end}
-                    </span>
-                  </div>
-                </Link>
-              </BlurFade>
-            ))}
+
+      {/* WORK */}
+      <section id="work" className="mx-auto w-full max-w-7xl">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
+          <div className="lg:col-span-4">
+            <BlurFade delay={BLUR_FADE_DELAY * 7}>
+              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold">Experience</h2>
+              <p className="mt-3 text-muted-foreground text-sm sm:text-base">
+                Hands-on roles in security operations, web development, and IT support.
+              </p>
+            </BlurFade>
+          </div>
+          <div className="lg:col-span-8">
+            <BlurFade delay={BLUR_FADE_DELAY * 8}>
+              <WorkSection />
+            </BlurFade>
           </div>
         </div>
       </section>
-      <section id="skills">
-        <div className="flex min-h-0 flex-col gap-y-4">
-          <BlurFade delay={BLUR_FADE_DELAY * 9}>
-            <h2 className="text-xl font-bold">Skills</h2>
-          </BlurFade>
-          <div className="flex flex-wrap gap-2">
-            {DATA.skills.map((skill, id) => (
-              <BlurFade key={skill.name} delay={BLUR_FADE_DELAY * 10 + id * 0.05}>
-                <div className="border bg-background border-border ring-2 ring-border/20 rounded-xl h-8 w-fit px-4 flex items-center gap-2">
-                  {skill.icon && <skill.icon className="size-4 rounded overflow-hidden object-contain" />}
-                  <span className="text-foreground text-sm font-medium">{skill.name}</span>
-                </div>
-              </BlurFade>
-            ))}
-          </div>
-        </div>
+
+      {/* CERTIFICATIONS & EDUCATION */}
+      <section id="certifications" className="mx-auto w-full max-w-7xl">
+        <BlurFade delay={BLUR_FADE_DELAY * 10}>
+          <CertificationsSection />
+        </BlurFade>
       </section>
-      <section id="projects">
-        <BlurFade delay={BLUR_FADE_DELAY * 11}>
+
+      {/* PROJECTS */}
+      <section id="projects" className="mx-auto w-full max-w-7xl">
+        <BlurFade delay={BLUR_FADE_DELAY * 15}>
           <ProjectsSection />
         </BlurFade>
       </section>
-      <section id="hackathons">
-        <BlurFade delay={BLUR_FADE_DELAY * 13}>
-          <HackathonsSection />
-        </BlurFade>
-      </section>
-      <section id="contact">
-        <BlurFade delay={BLUR_FADE_DELAY * 16}>
+
+      {/* CONTACT */}
+      <section id="contact" className="mx-auto w-full max-w-7xl pb-16">
+        <BlurFade delay={BLUR_FADE_DELAY * 17}>
           <ContactSection />
         </BlurFade>
       </section>
