@@ -1,7 +1,8 @@
 {
   // Cloudflare Worker that runs the Next.js app (SSR + API routes) via OpenNext.
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "godwin-portfolio",
+  //"name": "godwin-portfolio",
+  "name": "godwinenendu",
   "main": ".open-next/worker.js",
   "compatibility_date": "2025-03-01",
   "compatibility_flags": ["nodejs_compat"],
